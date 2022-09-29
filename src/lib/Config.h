@@ -1,15 +1,13 @@
 #ifndef _KACONFIG_H
 #define _KACONFIG_H
 
-
+#include "Common.h"
 #include "llvm/Support/FileSystem.h"
-#include <map>
-#include <unordered_map>
-#include <set>
-#include <unordered_set>
 #include <fstream>
 #include <map>
-#include "Common.h"
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 using namespace llvm;
@@ -32,6 +30,5 @@ extern int ENABLE_MLTA;
 #define SOURCE_CODE_PATH "/home/kjlu/projects/kernels/linux-5.1"
 //#define PRINT_SOURCE_LINE
 //#define MLTA_FIELD_INSENSITIVE
-
 
 #endif

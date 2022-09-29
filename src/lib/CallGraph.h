@@ -2,47 +2,41 @@
 #define _CALL_GRAPH_H
 
 #include "Analyzer.h"
-#include "MLTA.h"
 #include "Config.h"
+#include "MLTA.h"
 
-class CallGraphPass : 
-	public virtual IterativeModulePass, public virtual MLTA {
+class CallGraphPass : public virtual IterativeModulePass, public virtual MLTA {
 
-	private:
+private:
+  //
+  // Variables
+  //
 
-		//
-		// Variables
-		//
+  // Index of the module
+  int MIdx;
 
-		// Index of the module
-		int MIdx;
+  set<CallInst *> CallSet;
+  set<CallInst *> ICallSet;
+  set<CallInst *> MatchedICallSet;
 
-		set<CallInst *>CallSet;
-		set<CallInst *>ICallSet;
-		set<CallInst *>MatchedICallSet;
+  //
+  // Methods
+  //
+  void doMLTA(Function *F);
 
+public:
+  static int AnalysisPhase;
 
-		//
-		// Methods
-		//
-		void doMLTA(Function *F);
+  CallGraphPass(GlobalContext *Ctx_)
+      : IterativeModulePass(Ctx_, "CallGraph"), MLTA(Ctx_) {
 
+    LoadElementsStructNameMap(Ctx->Modules);
+    MIdx = 0;
+  }
 
-	public:
-		static int AnalysisPhase;
-
-		CallGraphPass(GlobalContext *Ctx_)
-			: IterativeModulePass(Ctx_, "CallGraph"),
-			MLTA(Ctx_) {
-
-				LoadElementsStructNameMap(Ctx->Modules);
-				MIdx = 0;
-			}
-
-		virtual bool doInitialization(llvm::Module *);
-		virtual bool doFinalization(llvm::Module *);
-		virtual bool doModulePass(llvm::Module *);
-
+  virtual bool doInitialization(llvm::Module *);
+  virtual bool doFinalization(llvm::Module *);
+  virtual bool doModulePass(llvm::Module *);
 };
 
 #endif
