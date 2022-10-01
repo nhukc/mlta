@@ -138,6 +138,33 @@ void PrintResults(GlobalContext *GCtx) {
      << "\n";
 }
 
+bool IsTopLevelIndirect(GlobalContext &GlobalCtx, const Function *f) {}
+
+void PrintCallstacks(GlobalContext &GlobalCtx, const Function *f, int depth,
+                     int indirectLayers, std::set<string> Seen) {
+  for (int i = 0; i < depth; i++) {
+    std::cout << "-";
+  }
+  if (Seen.find(f->getName().str()) != Seen.end()) {
+    std::cout << f->getName().str() << "[recursive]"
+              << "\n";
+    return;
+  }
+  std::cout << f->getName().str() << "\n";
+  auto callers = GlobalCtx.Callers.find(f);
+  if (callers == GlobalCtx.Callers.end())
+    return;
+  for (const auto *callinst : callers->second) {
+    int newLayers = indirectLayers;
+    if (callinst->isIndirectCall() && newLayers++ > 3)
+      return;
+    Seen.insert(f->getName().str());
+    PrintCallstacks(GlobalCtx, callinst->getCaller(), depth + 1, newLayers,
+                    Seen);
+    Seen.erase(f->getName().str());
+  }
+}
+
 int main(int argc, char **argv) {
 
   // Print a stack trace if we signal out.
@@ -180,6 +207,12 @@ int main(int argc, char **argv) {
 
   // Print final results
   PrintResults(&GlobalCtx);
+
+  for (const auto &[key, value] : GlobalCtx.GlobalFuncMap) {
+    if (value && value->getName().str() == "submit_bio") {
+      PrintCallstacks(GlobalCtx, value, 0, 0, {});
+    }
+  }
 
   return 0;
 }

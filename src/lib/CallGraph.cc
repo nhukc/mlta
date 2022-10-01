@@ -201,9 +201,7 @@ bool CallGraphPass::doInitialization(Module *M) {
     typePropInFunction(&F);
 
     // Collect global function definitions.
-    if (F.hasExternalLinkage()) {
-      Ctx->GlobalFuncMap[F.getGUID()] = &F;
-    }
+    Ctx->GlobalFuncMap[F.getGUID()] = &F;
   }
 
   // Do something at the end of last module
